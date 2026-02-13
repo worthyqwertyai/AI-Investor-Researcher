@@ -1,0 +1,43 @@
+# AI Investment Researcher
+
+This project creates a fully functioning AI chatbot and financial research assistant designed to analyze global stock, bond, and cryptocurrency markets. It uses deep research on public financial data, market indicators, and investment strategies of top investors to recommend:
+
+- Top 10 stocks under $50 to invest in
+- Best cryptocurrencies to buy now and in the coming weeks
+- Step-by-step instructions on how to buy these assets
+- Optimal buy/sell dates and times
+- Continuous data updates via scheduled tasks
+
+The AI sources data from multiple APIs and web scraping, applies advanced market analysis, and cites all references used in recommendations.
+
+---
+
+## Key Features
+
+- **Chatbot interface** for Q&A and investment advice
+- **Financial data aggregation** from stock exchanges, crypto exchanges, and bond markets worldwide
+- **Deep research** via web scraping, API data, and news sentiment analysis
+- **Market indicator analysis** (technical/fundamental) to identify top investment opportunities
+- **Investment strategy modeling** inspired by Warren Buffett, Ray Dalio, Cathie Wood, and others
+- **Automated scheduled data updates** for real-time relevance
+- **Detailed buy/sell instructions** including brokerage walkthroughs
+- **Full citations** for transparency and trustworthiness
+
+---
+
+## Tech Stack
+
+- Python 3.10+
+- FastAPI (chatbot API server)
+- LangChain + OpenAI GPT-4 (chatbot and research layer)
+- yfinance, Alpha Vantage, CoinGecko APIs (financial data)
+- BeautifulSoup + Requests (web scraping)
+- APScheduler (job scheduling)
+- Docker (containerization)
+- GitHub Actions (CI/CD)
+- Render.com deployment compatible
+
+---
+
+## Repository Structure
+
