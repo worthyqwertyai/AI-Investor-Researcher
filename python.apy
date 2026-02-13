@@ -1,0 +1,74 @@
+import os
+import time
+import json
+import requests
+import yfinance as yf
+import pandas as pd
+from datetime import datetime, timedelta
+from alpha_vantage.timeseries import TimeSeries
+from bs4 import BeautifulSoup
+
+# Constants and API keys (user must set these in environment variables for security)
+ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
+COINGECKO_API_URL = "https://api.coingecko.com/api/v3"
+
+def normalize_crypto_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalize raw cryptocurrency data to a consistent schema:
+    - Rename columns to standardized names
+    - Parse timestamps to pd.Timestamp (UTC)
+    - Normalize volume units to base unit (e.g., units of the crypto, not in USD)
+
+    Expected input columns might vary by source, examples include:
+    - 'time', 'timestamp', 'date' => 'datetime' (pd.Timestamp)
+    - 'vol', 'volume' => 'volume'
+    - 'open', 'open_price', 'price_open' => 'open'
+    - 'high', 'high_price' => 'high'
+    - 'low', 'low_price' => 'low'
+    - 'close', 'close_price' => 'close'
+    - 'market_cap' (optional)
+
+    Returns a DataFrame with columns:
+    ['datetime', 'open', 'high', 'low', 'close', 'volume', 'market_cap' (optional)]
+    """
+    df = df.copy()
+
+    column_map = {
+        'datetime': ['time', 'timestamp', 'date', 'datetime'],
+        'open': ['open', 'open_price', 'price_open'],
+        'high': ['high', 'high_price'],
+        'low': ['low', 'low_price'],
+        'close': ['close', 'close_price'],
+        'volume': ['vol', 'volume', 'volume_traded'],
+        'market_cap': ['market_cap', 'marketcap', 'mkt_cap']
+    }
+
+    rename_dict = {}
+    for std_col, possible_cols in column_map.items():
+        for col in possible_cols:
+            if col in df.columns:
+                rename_dict[col] = std_col
+                break
+
+    df.rename(columns=rename_dict, inplace=True)
+
+    # Convert datetime column to pandas datetime, assume UTC
+    if 'datetime' in df.columns:
+        df['datetime'] = pd.to_datetime(df['datetime'], errors='coerce', utc=True)
+    else:
+        raise ValueError("No datetime column found after normalization.")
+
+    # Ensure numeric columns are floats
+    numeric_cols = ['open', 'high', 'low', 'close', 'volume', 'market_cap']
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    # Drop rows with missing mandatory data
+    df.dropna(subset=['datetime', 'open', 'high', 'low', 'close', 'volume'], inplace=True)
+
+    # Sort by datetime ascending
+    df.sort_values('datetime', inplace=True)
+
+    return df
+  
